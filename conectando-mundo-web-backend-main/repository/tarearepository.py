@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, make_transient
 
 from model import tareamodel
 from schema import tareaschema
@@ -8,7 +8,6 @@ def create_tarea(db: Session, tarea: tareaschema.Tarea):
     db.add(db_tarea)
     db.commit()
     db.refresh(db_tarea)
-    db_tarea.fecha = db_tarea.fecha.strftime("%Y-%m-%d %H:%M")
     return db_tarea
 
 
@@ -17,10 +16,10 @@ def ver_tareas(db: Session, skip: int = 0, limit: int = 100):
 
 
 def ver_tarea(db: Session, tarea_id: int):
-    return db.query(tareamodel.Tarea).filter(tareamodel.Tarea.id == tarea_id).first()
+    return db.query(tareamodel.Tarea).filter(tareamodel.Tarea.idtarea == tarea_id).first()
 
-def update_tarea(db: Session, tarea_id: int, tarea: tareaschema.Tarea):
-    db_tarea = db.query(tareamodel.Tarea).filter(tareamodel.Tarea.id == tarea_id).first()
+def update_tarea(db: Session, tarea_id:int, tarea: tareaschema.Tarea):
+    db_tarea = db.query(tareamodel.Tarea).filter(tareamodel.Tarea.idtarea == tarea_id).first()
     if db_tarea is None:
         return None
     db_tarea.nombre = tarea.nombre or db_tarea.nombre
@@ -29,15 +28,21 @@ def update_tarea(db: Session, tarea_id: int, tarea: tareaschema.Tarea):
     db_tarea.prioridad = tarea.prioridad or db_tarea.prioridad
     db.commit()
     db.refresh(db_tarea)
-    db_tarea.fecha = db_tarea.fecha.strftime("%Y-%m-%d %H:%M")
     return db_tarea
 
 def delete_tarea(db: Session, tarea_id: int):
-    db_tarea = db.query(tareamodel.Tarea).filter(tareamodel.Tarea.id == tarea_id).first()
+    db_tarea = db.query(tareamodel.Tarea).filter(tareamodel.Tarea.idtarea == tarea_id).first()
     if db_tarea is None:
         return None
     db.delete(db_tarea)
     db.commit()
-    db.refresh(db_tarea)
-    db_tarea.fecha = db_tarea.fecha.strftime("%Y-%m-%d %H:%M")
-    return db_tarea
+    return None
+
+def ver_prioridaduno(db: Session):
+    return db.query(tareamodel.Tarea).filter(tareamodel.Tarea.prioridad == 1).all()
+
+def ver_prioridaddos(db: Session):
+    return db.query(tareamodel.Tarea).filter(tareamodel.Tarea.prioridad == 2).all()
+
+def ver_prioridadtres(db: Session):
+    return db.query(tareamodel.Tarea).filter(tareamodel.Tarea.prioridad == 3).all()
